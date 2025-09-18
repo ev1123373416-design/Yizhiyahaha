@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>快递进度小工具</title>
+<link rel="manifest" href="manifest.json">
+<style>
+html, body {
+  margin:0; padding:0; width:100%; height:100%;
+  font-family:"Segoe UI", "PingFang SC", sans-serif;
+  background:#f7f7f7; -webkit-tap-highlight-color:transparent;
+}
+h2 { text-align:center; margin:10px 0; font-size:20px; color:#333; }
+#delivery-list { padding:10px; padding-bottom:70px; box-sizing:border-box; max-width:480px; margin:0 auto; }
+.delivery { background:#fff; border-radius:12px; padding:10px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.12); transition:all 0.3s ease; font-size:15px; touch-action: manipulation; }
+.delivery.finished { opacity:0.7; }
+.delivery-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+.title { font-weight:bold; font-size:16px; cursor:pointer; flex:1; word-break:break-all; }
+.title input { font-size:16px; width:100%; padding:4px 6px; border-radius:6px; border:1px solid #ccc; }
+.actions button { border:none; padding:6px 12px; background:#4facfe; color:white; border-radius:8px; font-size:14px; cursor:pointer; transition:background 0.3s; }
+.actions button:hover { background:#0084ff; }
+.progress-container { position:relative; height:30px; }
+.progress-track { height:8px; background:#e0e0e0; border-radius:4px; overflow:hidden; position:relative; }
+.progress-bar { height:8px; width:5%; background:linear-gradient(90deg,#4facfe,#00f2fe); border-radius:4px; transition:width 0.6s ease; }
+.stages { position:absolute; top:-2px; left:0; right:0; display:flex; justify-content:space-between; pointer-events:none; }
+.stage { text-align:center; flex:1; font-size:10px; color:#777; position:relative; }
+.stage::before { content:""; width:14px; height:14px; border-radius:50%; background:#ccc; display:block; margin:0 auto; position:relative; top:3px; z-index:2; transition:background 0.3s; }
+.stage.active::before { background:#4facfe; }
+.stage.active { color:#4facfe; font-weight:bold; }
+.add-section { position:fixed; bottom:0; left:0; right:0; padding:10px; background:#fff; box-shadow:0 -2px 6px rgba(0,0,0,0.15); display:flex; gap:10px; max-width:480px; margin:0 auto; box-sizing:border-box; }
+.add-section input { flex:1; padding:8px; border-radius:8px; border:1px solid #ccc; font-size:15px; }
+.add-section button { padding:8px 14px; border:none; background:#28a745; color:white; border-radius:8px; font-size:15px; cursor:pointer; }
+.add-section button:hover { background:#218838; }
+</style>
+</head>
+<body>
+<h2>📦 我的快递进度</h2>
+<div id="delivery-list"></div>
+<div class="add-section">
+  <input id="delivery-name" type="text" placeholder="输入快递名称 (可留空)">
+  <button onclick="addDelivery()">➕ 添加快递</button>
+</div>
+<script>
+const stages = ["取货","退货","退款","完成"];
+let deliveryCount = 0;
+let deliveries = [];
+function getDatePrefix(){ const days=["周日","周一","周二","周三","周四","周五","周六"]; const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${days[d.getDay()]}`; }
+function saveToStorage(){ localStorage.setItem("deliveries",JSON.stringify(deliveries)); }
+function loadFromStorage(){ const data = localStorage.getItem("deliveries"); if(data){ deliveries=JSON.parse(data); deliveryCount=deliveries.length; deliveries.forEach(d=>renderDelivery(d)); } }
+function renderDelivery(delivery){ const list=document.getElementById("delivery-list"); const div=document.createElement("div"); div.className="delivery"; div.dataset.stage=delivery.stage; if(delivery.stage===stages.length-1) div.classList.add("finished"); div.innerHTML=`<div class="delivery-header"><div class="title" onclick="editTitle(this)">${delivery.name}</div><div class="actions"><button onclick="prevStage(this)">上一步</button><button onclick="nextStage(this)">下一步</button></div></div><div class="progress-container"><div class="progress-track"><div class="progress-bar"></div></div><div class="stages">${stages.map((s,i)=>`<div class="stage ${i<=delivery.stage?'active':''}">${s}</div>`).join("")}</div></div>`; if(delivery.stage===stages.length-1){ div.querySelector(".actions button:last-child").disabled=true; } list.appendChild(div); updateProgress(div,delivery.stage); }
+function addDelivery(){ const input=document.getElementById("delivery-name"); let name=input.value.trim(); input.value=""; deliveryCount++; if(!name) name=`快递 ${deliveryCount}`; const fullName=`${getDatePrefix()} ${name}`; const delivery={name:fullName,stage:0}; deliveries.push(delivery); saveToStorage(); renderDelivery(delivery); }
+function updateProgress(card,stage){ const bar=card.querySelector(".progress-bar"); const progressPercent=5+(stage*(95/(stages.length-1))); bar.style.width=`${progressPercent}%`; const stageEls=card.querySelectorAll(".stage"); stageEls.forEach((el,i)=>el.classList.toggle("active",i<=stage)); }
+function nextStage(btn){ const card=btn.closest(".delivery"); let index=Array.from(card.parentNode.children).indexOf(card); let stage=deliveries[index].stage; if(stage>=stages.length-1) return; stage++; deliveries[index].stage=stage; card.dataset.stage=stage; updateProgress(card,stage); if(stage===stages.length-1){ card.classList.add("finished"); btn.disabled=true; card.parentNode.appendChild(card); } saveToStorage(); }
+function prevStage(btn){ const card=btn.closest(".delivery"); let index=Array.from(card.parentNode.children).indexOf(card); let stage=deliveries[index].stage; if(stage<=0) return; stage--; deliveries[index].stage=stage; card.dataset.stage=stage; updateProgress(card,stage); card.querySelector(".actions button:last-child").disabled=false; card.classList.remove("finished"); saveToStorage(); }
+function editTitle(titleEl){ const card=titleEl.closest(".delivery"); const index=Array.from(card.parentNode.children).indexOf(card); const oldName=deliveries[index].name; const input=document.createElement("input"); input.type="text"; input.value=oldName; titleEl.innerHTML=""; titleEl.appendChild(input); input.focus(); function save(){ let val=input.value.trim(); if(!val) val=oldName; deliveries[index].name=val; titleEl.textContent=val; saveToStorage(); } input.addEventListener("blur",save); input.addEventListener("keydown",(e)=>{ if(e.key==="Enter") input.blur(); }); }
+loadFromStorage();
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').then(()=>console.log('SW registered')); }
+</script>
+</body>
+</html>
