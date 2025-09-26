@@ -25,3 +25,17 @@ Simple Task-tracking Tool
 
 ## 文件结构
 
+## 技术栈
+
+- HTML5 + CSS3 + JavaScript
+- 本地浏览器 `localStorage` 持久化
+
+## 自定义
+
+- 可在 `stages` 数组中修改任务阶段
+- 可在 CSS 中调整颜色、按钮样式、进度条样式等
+
+## 许可证
+
+MIT License
+
