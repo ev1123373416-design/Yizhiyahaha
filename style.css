@@ -1,0 +1,54 @@
+html, body {
+  margin:0; padding:0; width:100%; height:100%;
+  font-family:"Segoe UI","PingFang SC",sans-serif;
+  background:#f7f7f7; -webkit-tap-highlight-color:transparent;
+}
+h2 { text-align:center; margin:10px 0; font-size:20px; color:#333; }
+#archive-toggle { text-align:center; margin:10px 0; cursor:pointer; color:#007aff; }
+#archive-list { display:none; max-width:480px; margin:0 auto 10px; }
+#delivery-list { padding:0 10px 70px; box-sizing:border-box; max-width:480px; margin:0 auto; }
+.delivery {
+  background:#fff; border-radius:10px; padding:8px; margin-bottom:10px;
+  box-shadow:0 2px 4px rgba(0,0,0,0.12); font-size:14px;
+  transition:all 0.3s ease; touch-action: manipulation;
+}
+.delivery.finished { opacity:0.7; }
+.delivery-header { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px; }
+.title { font-weight:bold; font-size:14px; cursor:pointer; flex:1; word-break:break-all; }
+.title input { font-size:14px; width:100%; padding:2px 4px; border-radius:4px; border:1px solid #ccc; }
+.actions { display: flex; gap: 6px; }
+.actions button {
+  flex: 1;
+  min-width: 60px;
+  padding: 3px 0;
+  background:#4facfe;
+  color:white;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  font-size:12px;
+  cursor:pointer;
+  transition:background 0.3s;
+  text-align:center;
+}
+.actions button:hover { background:#0084ff; }
+.progress-container { position:relative; height:24px; }
+.progress-track { height:6px; background:#e0e0e0; border-radius:3px; position:relative; margin:0 5%; }
+.progress-bar { height:6px; width:5%; background:linear-gradient(90deg,#4facfe,#00f2fe); border-radius:3px; transition:width 0.6s ease; }
+.stages { position:absolute; top:-2px; left:0; right:0; height:24px; pointer-events:none; }
+.stage { font-size:10px; color:#777; text-align:center; width:60px; position:absolute; top:5px; transform:translateX(-50%); }
+.stage.active { color:#4facfe; font-weight:bold; }
+.stage::before { content:""; width:12px; height:12px; border-radius:50%; background:#ccc; display:block; margin:0 auto 2px; transition:background 0.3s; }
+.stage.active::before { background:#4facfe; }
+.add-section {
+  position:fixed; bottom:0; left:0; right:0; padding:10px;
+  background:#fff; box-shadow:0 -2px 6px rgba(0,0,0,0.15);
+  display:flex; gap:6px; max-width:480px; margin:0 auto; box-sizing:border-box;
+}
+.add-section input {
+  flex:1; padding:6px; border-radius:6px; border:1px solid #ccc; font-size:14px;
+}
+.add-section button {
+  padding:6px 10px; border:none; background:#28a745; color:white; border-radius:6px; font-size:14px; cursor:pointer;
+}
+.add-section button:hover { background:#218838; }

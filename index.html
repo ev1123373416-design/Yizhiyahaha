@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>任务进度小工具</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h2>📦 我的任务进度</h2>
+<div id="archive-toggle" onclick="toggleArchive()">📂 已归档任务 (点击展开/收起)</div>
+<div id="archive-list"></div>
+<div id="delivery-list"></div>
+<div class="add-section">
+  <input id="delivery-name" type="text" placeholder="输入任务名称 (Enter确认)">
+  <button onclick="addDelivery()">➕ 添加任务</button>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
